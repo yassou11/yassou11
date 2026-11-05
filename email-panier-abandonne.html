@@ -1,0 +1,106 @@
+<!--
+  Modèle e-mail "Panier abandonné" — Mitt Gosedjur
+  À coller dans : Paramètres → Notifications → Clients → Panier abandonné → Modifier le code
+  Objet conseillé : {{ customer.first_name | default: "Hej" }}, ton panier t'attend 🧸 (+ 10 % offerts)
+  Code promo utilisé : BIENTOT10  (à remplacer par le code réellement créé)
+-->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ton panier t'attend</title>
+  <style>
+    body { margin:0; padding:0; background:#f6f1ea; font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif; color:#2b2b2b; }
+    .wrap { max-width:600px; margin:0 auto; background:#ffffff; }
+    .pad { padding:28px 32px; }
+    h1 { font-size:26px; line-height:1.25; margin:0 0 12px; }
+    p { font-size:16px; line-height:1.55; margin:0 0 14px; }
+    .btn { display:inline-block; background:#e8590c; color:#ffffff !important; text-decoration:none; font-weight:700; font-size:18px; padding:16px 34px; border-radius:8px; }
+    .code { display:inline-block; border:2px dashed #e8590c; background:#fff7f0; color:#e8590c; font-size:24px; font-weight:800; letter-spacing:3px; padding:10px 22px; border-radius:8px; }
+    .muted { color:#777; font-size:13px; }
+    .trust td { font-size:13px; text-align:center; padding:6px 4px; color:#555; }
+    @media (max-width:480px) { .pad { padding:22px 18px; } h1 { font-size:22px; } .btn { display:block; text-align:center; } }
+  </style>
+</head>
+<body>
+  <!-- Préheader (texte d'aperçu dans la boîte mail) -->
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0;">
+    Ton panier est réservé 48 h — et on t'offre 10 % pour terminer ta commande.
+  </div>
+
+  <table class="wrap" width="100%" cellpadding="0" cellspacing="0" role="presentation">
+    <!-- Logo -->
+    <tr><td align="center" style="padding:24px 0 8px;">
+      {% if shop.email_logo_url %}
+        <img src="{{ shop.email_logo_url }}" alt="{{ shop.name }}" width="{{ shop.email_logo_width }}" style="max-width:100%;height:auto;">
+      {% else %}
+        <span style="font-size:24px;font-weight:800;">{{ shop.name }}</span>
+      {% endif %}
+    </td></tr>
+
+    <!-- Accroche -->
+    <tr><td class="pad" style="padding-bottom:8px;">
+      <h1>Oups, tu as oublié quelque chose 🧸</h1>
+      <p>Bonjour {{ customer.first_name | default: "toi" }}, tes articles sont toujours dans ton panier. On les met de côté pendant <strong>48 heures</strong> — après, on ne peut plus garantir la disponibilité.</p>
+    </td></tr>
+
+    <!-- Récap produits (visuel = déclencheur d'envie) -->
+    <tr><td class="pad" style="padding-top:8px;padding-bottom:8px;">
+      <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="border:1px solid #eee;border-radius:8px;">
+        {% for line in subtotal_line_items %}
+        <tr>
+          <td width="96" style="padding:12px;">
+            {% if line.image %}<img src="{{ line | img_url: '200x200' }}" alt="{{ line.title | escape }}" width="80" style="border-radius:6px;display:block;">{% endif %}
+          </td>
+          <td style="padding:12px 8px;font-size:15px;">
+            <strong>{{ line.title }}</strong><br>
+            <span class="muted">Quantité : {{ line.quantity }}</span>
+          </td>
+          <td align="right" style="padding:12px;font-size:15px;font-weight:700;white-space:nowrap;">{{ line.line_price | money }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    </td></tr>
+
+    <!-- CTA principal -->
+    <tr><td align="center" class="pad">
+      <a class="btn" href="{{ url }}">Terminer ma commande →</a>
+      <p class="muted" style="margin-top:12px;">Paiement sécurisé · Retours faciles</p>
+    </td></tr>
+
+    <!-- Offre -10 % -->
+    <tr><td align="center" class="pad" style="background:#fff7f0;">
+      <p style="margin-bottom:6px;"><strong>Un petit coup de pouce 🎁</strong></p>
+      <p style="margin-bottom:14px;">Utilise ce code à la caisse pour <strong>10 % de réduction</strong> :</p>
+      <span class="code">BIENTOT10</span>
+      <p class="muted" style="margin-top:14px;">Valable 48 h, une seule utilisation par client.</p>
+      <p style="margin-top:6px;"><a href="{{ url }}" style="color:#e8590c;font-weight:700;">Utiliser mon code maintenant</a></p>
+    </td></tr>
+
+    <!-- Réassurance -->
+    <tr><td class="pad" style="padding-top:20px;padding-bottom:8px;">
+      <table class="trust" width="100%" cellpadding="0" cellspacing="0" role="presentation">
+        <tr>
+          <td>🚚<br><strong>Livraison suivie</strong></td>
+          <td>↩️<br><strong>Retours faciles</strong></td>
+          <td>🔒<br><strong>Paiement sécurisé</strong></td>
+        </tr>
+      </table>
+    </td></tr>
+
+    <!-- Preuve sociale (remplace par un vrai avis client) -->
+    <tr><td class="pad" style="padding-top:8px;">
+      <p style="font-style:italic;text-align:center;margin-bottom:4px;">« ★★★★★ Remplace ce texte par un vrai avis client »</p>
+      <p class="muted" style="text-align:center;">— Prénom, client(e) vérifié(e)</p>
+    </td></tr>
+
+    <!-- Contact / FAQ -->
+    <tr><td class="pad" style="border-top:1px solid #eee;">
+      <p style="font-size:14px;">Une question sur la taille, la livraison ou un produit ? Réponds simplement à cet e-mail ou écris-nous à <a href="mailto:{{ shop.email }}">{{ shop.email }}</a>, on répond vite.</p>
+      <p class="muted">Tu reçois cet e-mail car tu as commencé une commande sur {{ shop.name }}.<br>
+        <a href="{{ shop.url }}" style="color:#777;">{{ shop.name }}</a></p>
+    </td></tr>
+  </table>
+</body>
+</html>
