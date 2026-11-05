@@ -1,0 +1,106 @@
+<!--
+  Mall för övergiven varukorg — Mitt Gosedjur
+  Klistra in i: Inställningar → Aviseringar → Kund → Övergiven varukorg → Redigera kod
+  Ämne: {{ customer.first_name | default: "Hej" }}, din varukorg väntar 🧸 (+ 10 % rabatt)
+  Rabattkod: TILLBAKA10
+-->
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Din varukorg väntar</title>
+  <style>
+    body { margin:0; padding:0; background:#eef2f7; font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif; color:#2b2b2b; }
+    .wrap { max-width:600px; margin:0 auto; background:#ffffff; }
+    .pad { padding:28px 32px; }
+    h1 { font-size:26px; line-height:1.25; margin:0 0 12px; }
+    p { font-size:16px; line-height:1.55; margin:0 0 14px; }
+    .btn { display:inline-block; background:#1f6feb; color:#ffffff !important; text-decoration:none; font-weight:700; font-size:18px; padding:16px 34px; border-radius:8px; }
+    .code { display:inline-block; border:2px dashed #1f6feb; background:#eaf2ff; color:#1f6feb; font-size:24px; font-weight:800; letter-spacing:3px; padding:10px 22px; border-radius:8px; }
+    .muted { color:#777; font-size:13px; }
+    .trust td { font-size:13px; text-align:center; padding:6px 4px; color:#555; }
+    @media (max-width:480px) { .pad { padding:22px 18px; } h1 { font-size:22px; } .btn { display:block; text-align:center; } }
+  </style>
+</head>
+<body>
+  <!-- Préheader (texte d'aperçu dans la boîte mail) -->
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0;">
+    Din varukorg är reserverad i 48 timmar – och du får 10 % rabatt när du slutför ditt köp.
+  </div>
+
+  <table class="wrap" width="100%" cellpadding="0" cellspacing="0" role="presentation">
+    <!-- Logo -->
+    <tr><td align="center" style="padding:24px 0 8px;">
+      {% if shop.email_logo_url %}
+        <img src="{{ shop.email_logo_url }}" alt="{{ shop.name }}" width="{{ shop.email_logo_width }}" style="max-width:100%;height:auto;">
+      {% else %}
+        <span style="font-size:24px;font-weight:800;">{{ shop.name }}</span>
+      {% endif %}
+    </td></tr>
+
+    <!-- Accroche -->
+    <tr><td class="pad" style="padding-bottom:8px;">
+      <h1>Hoppsan, du glömde något 🧸</h1>
+      <p>Hej {{ customer.first_name | default: "där" }}, dina varor ligger kvar i varukorgen. Vi sparar dem i <strong>48 timmar</strong> – därefter kan vi inte garantera att de finns kvar.</p>
+    </td></tr>
+
+    <!-- Récap produits (visuel = déclencheur d'envie) -->
+    <tr><td class="pad" style="padding-top:8px;padding-bottom:8px;">
+      <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="border:1px solid #eee;border-radius:8px;">
+        {% for line in subtotal_line_items %}
+        <tr>
+          <td width="96" style="padding:12px;">
+            {% if line.image %}<img src="{{ line | img_url: '200x200' }}" alt="{{ line.title | escape }}" width="80" style="border-radius:6px;display:block;">{% endif %}
+          </td>
+          <td style="padding:12px 8px;font-size:15px;">
+            <strong>{{ line.title }}</strong><br>
+            <span class="muted">Antal: {{ line.quantity }}</span>
+          </td>
+          <td align="right" style="padding:12px;font-size:15px;font-weight:700;white-space:nowrap;">{{ line.line_price | money }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    </td></tr>
+
+    <!-- CTA principal -->
+    <tr><td align="center" class="pad">
+      <a class="btn" href="{{ url }}">Slutför mitt köp →</a>
+      <p class="muted" style="margin-top:12px;">Säker betalning · Enkla returer</p>
+    </td></tr>
+
+    <!-- Offre -10 % -->
+    <tr><td align="center" class="pad" style="background:#eaf2ff;">
+      <p style="margin-bottom:6px;"><strong>Lite extra hjälp 🎁</strong></p>
+      <p style="margin-bottom:14px;">Använd koden i kassan för <strong>10 % rabatt</strong>:</p>
+      <span class="code">TILLBAKA10</span>
+      <p class="muted" style="margin-top:14px;">Gäller i 48 timmar, en användning per kund.</p>
+      <p style="margin-top:6px;"><a href="{{ url }}" style="color:#1f6feb;font-weight:700;">Använd min kod nu</a></p>
+    </td></tr>
+
+    <!-- Réassurance -->
+    <tr><td class="pad" style="padding-top:20px;padding-bottom:8px;">
+      <table class="trust" width="100%" cellpadding="0" cellspacing="0" role="presentation">
+        <tr>
+          <td>🚚<br><strong>Spårbar frakt</strong></td>
+          <td>↩️<br><strong>Enkla returer</strong></td>
+          <td>🔒<br><strong>Säker betalning</strong></td>
+        </tr>
+      </table>
+    </td></tr>
+
+    <!-- Preuve sociale (remplace par un vrai avis client) -->
+    <tr><td class="pad" style="padding-top:8px;">
+      <p style="font-style:italic;text-align:center;margin-bottom:4px;">« ★★★★★ Remplace ce texte par un vrai avis client »</p>
+      <p class="muted" style="text-align:center;">— Prénom, client(e) vérifié(e)</p>
+    </td></tr>
+
+    <!-- Contact / FAQ -->
+    <tr><td class="pad" style="border-top:1px solid #eee;">
+      <p style="font-size:14px;">Har du frågor om storlek, leverans eller en produkt? Svara på det här mejlet eller skriv till oss på <a href="mailto:{{ shop.email }}">{{ shop.email }}</a>, så svarar vi snabbt.</p>
+      <p class="muted">Du får det här mejlet eftersom du påbörjade ett köp hos {{ shop.name }}.<br>
+        <a href="{{ shop.url }}" style="color:#777;">{{ shop.name }}</a></p>
+    </td></tr>
+  </table>
+</body>
+</html>
